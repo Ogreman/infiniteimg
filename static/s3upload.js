@@ -103,7 +103,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
       } else {
         xhr.onload = function() {
           if (xhr.status === 200) {
-            this_s3upload.onProgress(100, 'Upload completed.', public_url, file);
+            this_s3upload.onProgress(100, 'Upload completed.');
             return this_s3upload.onFinishS3Put(public_url, file);
           } else {
             return this_s3upload.onError('Upload error: ' + xhr.status, file);
