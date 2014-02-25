@@ -3,6 +3,7 @@ Jinja2==2.7.2
 MarkupSafe==0.18
 Unipath==1.0
 Werkzeug==0.9.4
+boto==2.25.0
 gunicorn==18.0
 itsdangerous==0.23
 python-dateutil==2.2
