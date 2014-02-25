@@ -25,7 +25,7 @@ def submit_form():
     bucket = Bucket(conn, S3_BUCKET)
     for k in bucket.list():
         if k.name != request.form["image_url"].split('/')[-1]:
-            bucket.delete_key(k)
+            bucket.delete_key(k.key)
     os.environ['IMG_URL'] = request.form["image_url"]    
     return redirect(url_for('index'))
 
