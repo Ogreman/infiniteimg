@@ -1,24 +1,24 @@
 
 {% extends 'layout.html' %}
 {% block body %}
-<h id="check" style="
+<h1 id="check" style="
     position: fixed;
-    top: 10%;
-    left: 30%;
-    font-size: 63px;
+    left: 5px;
+    top: 5px;
+    font-size: 40px;
 ">
-<div style="border:1px solid gray; width:300px;"  id="preview"><img src="{{ current_image }}" style="width:300px" /></div>
 
 <input type="file" id="files"/>
 <p id="status"></p>
 
 <form method="POST" action="/submit_form/">
-
     <input type="hidden" id="image_url" name="image_url" value="{{ current_image }}" />    
-
     <input type="submit" value="Update" />
 </form>
+
+<div style="border:1px solid gray; width:300px;"  id="preview"><img src="{{ current_image }}" /></div>
 </h1>
+
 
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script type="text/javascript" src="/static/lodash.min.js"></script>
@@ -33,9 +33,9 @@ function s3_upload(){
             $('#status').html('Upload progress: ' + percent + '% ' + message);
         },
         onFinishS3Put: function(public_url) {
-            $('#status').html('Upload completed. Uploaded to: '+ public_url);
+            $('#status').html('Upload completed.');
             $("#image_url").val(public_url);
-            $("#preview").html('<img src="'+public_url+'" style="width:300px;" />');
+            $("#preview").html('<img src="'+public_url+'" />');
         },
         onError: function(status) {
             $('#status').html('Upload error: ' + status);
