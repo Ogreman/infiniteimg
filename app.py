@@ -9,12 +9,23 @@ from flask import Flask, render_template, request, redirect, Response, url_for
 from hashlib import sha1
 from unipath import Path
 
+from boto.s3.connection import S3Connection
+from boto.s3.bucket import Bucket
+
 TEMPLATE_DIR = Path(__file__).ancestor(1).child("templates")
 app = Flask(__name__, template_folder=TEMPLATE_DIR)
 
 
 @app.route("/submit_form/", methods=["POST"])
 def submit_form():
+    AWS_ACCESS_KEY = os.environ.get('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+    S3_BUCKET = os.environ.get('S3_BUCKET_NAME')
+    conn = S3Connection(AWS_ACCESS_KEY, AWS_SECERET_KEY)
+    bucket = Bucket(conn, S3_BUCKET)
+    for k in bucket.list():
+        if k.name != request.form["image_url"].split('/')[-1]:
+            bucket.delete_key(k)
     os.environ['IMG_URL'] = request.form["image_url"]    
     return redirect(url_for('index'))
 
