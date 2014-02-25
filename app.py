@@ -2,8 +2,6 @@
 
 import sys
 import json
-import argparse
-import time, os, json, base64, hmac, urllib
 
 from flask import Flask, render_template, request, redirect, Response, url_for
 from hashlib import sha1
