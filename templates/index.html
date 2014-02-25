@@ -13,7 +13,7 @@
 
 <form method="POST" action="/submit_form/">
     <input type="hidden" id="image_url" name="image_url" value="{{ current_image }}" />
-    <input type="submit" value="Update" />
+    <input type="submit" id="btn" value="Update" />
 </form>
 </h1>
 
@@ -30,11 +30,13 @@ function s3_upload(){
         s3_sign_put_url: '/sign_s3/',
         onProgress: function(percent, message) {
             $('#status').html('Upload progress: ' + percent + '% ' + message);
+            $('#btn').attr('disabled', true);
         },
         onFinishS3Put: function(public_url) {
             $('#status').html('Upload completed.');
             $("#image_url").val(public_url);
             $("#preview").html('<img src="'+public_url+'" style="width:300px;" />');
+            $('#btn').attr('disabled', false);
         },
         onError: function(status) {
             $('#status').html('Upload error: ' + status);
