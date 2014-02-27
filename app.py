@@ -2,6 +2,8 @@
 
 import sys
 import json
+import argparse
+import time, os, json, base64, hmac, urllib
 
 from flask import Flask, render_template, request, redirect, Response, url_for
 from hashlib import sha1
@@ -78,7 +80,8 @@ def index():
     def get_image():
         key, secret, bucket_name = get_keys()
         bucket = get_bucket(key, secret, bucket_name)
-        keys = bucket.get_all_keys(max_keys=1)
+        keys = bucket.get_all_keys()
+        keys.sort(key=lambda x: x.last_modified)
         return 'https://{bucket_name}.s3.amazonaws.com/{image}'.format(
             bucket_name=bucket.name,
             image=keys[0].name
