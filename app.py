@@ -6,6 +6,10 @@ import argparse
 import time, os, json, base64, hmac, urllib
 
 from flask import Flask, render_template, request, redirect, Response, url_for
+from flask.ext.api import FlaskAPI, status, exceptions
+from flask.ext.api.decorators import set_renderers
+from flask.ext.api.renderers import HTMLRenderer
+from flask.ext.api.exceptions import APIException
 from hashlib import sha1
 from unipath import Path
 
@@ -13,7 +17,8 @@ from boto.s3.connection import S3Connection
 from boto.s3.bucket import Bucket
 
 TEMPLATE_DIR = Path(__file__).ancestor(1).child("templates")
-app = Flask(__name__, template_folder=TEMPLATE_DIR)
+app = FlaskAPI(__name__, template_folder=TEMPLATE_DIR)
+# app = Flask(__name__, template_folder=TEMPLATE_DIR)
 
 
 def get_keys():
@@ -30,6 +35,7 @@ def get_bucket(key, secret, bucket_name):
 
 
 @app.route("/submit_form/", methods=["POST"])
+@set_renderers([HTMLRenderer])
 def submit_form():
     key, secret, bucket_name = get_keys()
     bucket = get_bucket(key, secret, bucket_name)
@@ -39,7 +45,8 @@ def submit_form():
     return redirect(url_for('index'))
 
 
-@app.route('/sign_s3/')
+@app.route('/sign_s3/', methods=["GET"])
+@set_renderers([HTMLRenderer])
 def sign_s3():
     # Load necessary information into the application:
     AWS_ACCESS_KEY, AWS_SECRET_KEY, S3_BUCKET = get_keys()
@@ -72,7 +79,8 @@ def sign_s3():
     return Response(content, mimetype='text/plain; charset=x-user-defined')
 
 
-@app.route('/')
+@app.route('/', methods=["GET"])
+@set_renderers([HTMLRenderer])
 def index():
     """
     Return the main view.
@@ -87,6 +95,20 @@ def index():
             image=keys[0].name
         ) if keys else ''
     return render_template('index.html', current_image=get_image())
+
+
+# JS fetches each image url for each square using co-ordinates before rendering
+@app.route("/image/<int:coord>/", methods=['GET'])
+def image(coord):
+    key, secret, bucket_name = get_keys()
+    bucket = get_bucket(key, secret, bucket_name)
+    image_key = bucket.get_key(coord)
+    return {
+        'image_url': 'https://{bucket_name}.s3.amazonaws.com/{image}'.format(
+            bucket_name=bucket.name,
+            image=image_key.name
+        ) if image_key else '',
+    }, status.HTTP_200_OK if image_key else status.HTTP_204_NO_CONTENT 
 
 
 def main():
